@@ -2,9 +2,9 @@
 
 ## Requirements
 ### SW:
-- Homebridge install on local network
-- Homebridge MQTThing plugin
-- An MQTT broker on local network
+- Homebridge install on local network (https://homebridge.io/)
+- Homebridge MQTTThing plugin (https://github.com/arachnetech/homebridge-mqttthing)
+- An MQTT broker on local network (I'm using Mosquitto: https://mosquitto.org/download/)
 
 ### HW:
 - Pimoroni PlasmaStick RP2040 (https://shop.pimoroni.com/products/plasma-stick-2040-w?variant=40359072301139)
