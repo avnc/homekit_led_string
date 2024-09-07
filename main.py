@@ -10,72 +10,23 @@ import plasma
 from plasma import plasma_stick
 from machine import Timer, Pin
 
-# Set how many LEDs you have
+# Constants
+# Set how many LEDs you have, set this as needed
 NUM_LEDS = 50
-filename = "lastvalue.txt"
+FILENAME = "lastvalue.txt" # file to store last value
 
-try:
-    f = open(filename)
-    val = f.read()
-    f.close()
-except:
-    val = "0, 0, 0"
+def read_last_value(filename):
+    try:
+        with open(filename) as f:
+            val = f.read()
+    except:
+        val = "0, 0, 0"
+    return map(int, val.split(","))
 
-red, green, blue = map(int, val.split(","))
-    
-print(f"last value is {val}")
-
-def status_handler(mode, status, ip):
-    # reports wifi connection status
-    print(mode, status, ip)
-    print('Connecting to wifi...')
-    # flash while connecting
-    for i in range(NUM_LEDS):
-        led_strip.set_rgb(i, 255, 255, 255)
-        time.sleep(0.02)
-    for i in range(NUM_LEDS):
-        led_strip.set_rgb(i, 0, 0, 0)
-    if status is not None:
-        if status:
-            print('Connection successful!')
-        else:
-            print('Connection failed!')
-            # light up red if connection fails
-            for i in range(NUM_LEDS):
-                led_strip.set_rgb(i, 255, 0, 0)
-            # sleep for 1 min, then turn off
-            time.sleep(60)
-            for i in range(NUM_LEDS):
-                led_strip.set_rgb(i, 0, 0, 0)
-            
-
-# set up the Pico W's onboard LED
-pico_led = Pin('LED', Pin.OUT)
-
-# set up the WS2812 / NeoPixel™ LEDs
-led_strip = plasma.WS2812(NUM_LEDS, 0, 0, plasma_stick.DAT, color_order=plasma.COLOR_ORDER_RGB)
-
-# start updating the LED strip
-led_strip.start()
-
-# set up wifi, set timeout to 3mins to handle power loss (wifi takes a couple of mins to come back online
-network_manager = NetworkManager(WIFI_CONFIG.COUNTRY, status_handler=status_handler, client_timeout=180)
-uasyncio.get_event_loop().run_until_complete(network_manager.client(WIFI_CONFIG.SSID, WIFI_CONFIG.PSK))
-
-#Define MQTT parameters
-mqtt_broker = WIFI_CONFIG.BROKER
-
-mqtt_topic_set = WIFI_CONFIG.LOCATION + WIFI_CONFIG.SET_RGB
-mqtt_topic_get = WIFI_CONFIG.LOCATION + WIFI_CONFIG.GET_RGB
-mqtt_topic_setOn = WIFI_CONFIG.LOCATION + WIFI_CONFIG.SET_ON
-
-# Initialize MQTT client
-client = MQTTClient(WIFI_CONFIG.HOSTNAME, server=mqtt_broker)
-# Define the RGB color (initially off)
-
+# Define the RGB color (initially off unless a saved value is found)
 def update_last_value( red, green, blue ):
     try:
-        f = open(filename, "wt")
+        f = open(FILENAME, "wt")
         f.write(str(red) + "," + str(green) + "," + str(blue))
         print("wrote last value to file")
         f.close()
@@ -110,6 +61,56 @@ def mqtt_callback(topic, msg):
         # Respond with the current RGB color
         client.publish(topic, f"{red},{green},{blue}")
 
+def status_handler(mode, status, ip):
+    # reports wifi connection status
+    print(mode, status, ip)
+    print('Connecting to wifi...')
+    # flash while connecting
+    for i in range(NUM_LEDS):
+        led_strip.set_rgb(i, 255, 255, 255)
+        time.sleep(0.02)
+    for i in range(NUM_LEDS):
+        led_strip.set_rgb(i, 0, 0, 0)
+    if status is not None:
+        if status:
+            print('Connection successful!')
+        else:
+            print('Connection failed!')
+            # light up red if connection fails
+            for i in range(NUM_LEDS):
+                led_strip.set_rgb(i, 255, 0, 0)
+            # sleep for 1 min, then turn off
+            time.sleep(60)
+            for i in range(NUM_LEDS):
+                led_strip.set_rgb(i, 0, 0, 0)
+
+# read last value from file           
+red, green, blue = read_last_value(FILENAME)
+print(f"last value is {val}")
+
+# set up the Pico W's onboard LED
+pico_led = Pin('LED', Pin.OUT)
+
+# set up the WS2812 / NeoPixel™ LEDs
+led_strip = plasma.WS2812(NUM_LEDS, 0, 0, plasma_stick.DAT, color_order=plasma.COLOR_ORDER_RGB)
+
+# start updating the LED strip
+led_strip.start()
+
+# set up wifi, set timeout to 3 mins to handle power loss (wifi takes a couple of mins to come back online)
+# if set to too low a timeout, the device will not connect to wifi on boot
+network_manager = NetworkManager(WIFI_CONFIG.COUNTRY, status_handler=status_handler, client_timeout=180)
+uasyncio.get_event_loop().run_until_complete(network_manager.client(WIFI_CONFIG.SSID, WIFI_CONFIG.PSK))
+
+#Define MQTT parameters
+mqtt_broker = WIFI_CONFIG.BROKER
+mqtt_topic_set = WIFI_CONFIG.LOCATION + WIFI_CONFIG.SET_RGB
+mqtt_topic_get = WIFI_CONFIG.LOCATION + WIFI_CONFIG.GET_RGB
+mqtt_topic_setOn = WIFI_CONFIG.LOCATION + WIFI_CONFIG.SET_ON
+
+# Initialize MQTT client
+client = MQTTClient(WIFI_CONFIG.HOSTNAME, server=mqtt_broker)
+
 # Connect to the MQTT broker and set the callback function
 client.set_callback(mqtt_callback)
 client.connect()
@@ -117,10 +118,11 @@ client.subscribe(mqtt_topic_set)
 client.subscribe(mqtt_topic_get)
 client.subscribe(mqtt_topic_setOn)
 
-# set initial values
+# set initial values (read from file or defaults to 0,0,0 if no file)
 for i in range(NUM_LEDS):
     led_strip.set_rgb(i, red, green, blue)
 
+# Main loop
 try:
     while True:
         # Check for incoming MQTT messages
