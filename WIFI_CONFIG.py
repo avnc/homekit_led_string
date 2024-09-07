@@ -1,0 +1,9 @@
+SSID = "WIFI_SSID"
+PSK = "WIFI_PASSWORD"
+COUNTRY = "COUNTRY_CODE" # e.g. "US"
+BROKER = "BROKER_IP" # e.g. "192.168.1.2"
+HOSTNAME = "NETWORK_HOSTNAME" # e.g. "DasBlinkenLights"
+LOCATION = b"LOCATION" # e.g. b"Living\\Cabinet2\\" for MQTT topic
+SET_ON = b"setOn" # MQTT topic for turning on/off
+GET_RGB = b"getRGB" # MQTT topic for getting RGB values
+SET_RGB = b"setRGB" # MQTT topic for setting RGB values
