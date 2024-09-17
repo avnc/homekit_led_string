@@ -19,6 +19,8 @@ def read_value(filename):
             val = f.read()
     except:
         val = "0, 0, 0"
+        print("exception reading value")
+        
     return map(int, val.split(","))
 
 # Define the RGB color (initially off unless a saved value is found)
@@ -26,7 +28,7 @@ def update_value(red, green, blue, update_file = LAST_FILENAME ):
     try:
         f = open(update_file, "wt")
         f.write(str(red) + "," + str(green) + "," + str(blue))
-        print(f"wrote value to file {update_file}")
+        print(f"wrote value {red},{green},{blue} to file {update_file}")
         f.close()
     except Exception as e:
         # do nothing
@@ -49,13 +51,19 @@ def mqtt_callback(topic, msg):
     if topic.endswith(b"setOn"):    
         if msg == b"true":
             print("turning on")
+            # get value before it was turned off
             red, green, blue = read_value(PREV_FILENAME)
+            print(f"setting to r: {red}. g: {green}, b: {blue}")
+            # set the last value to this value
+            update_value(red, green, blue)
             for i in range(NUM_LEDS):
                 led_strip.set_rgb(i, red, green, blue)
                 time.sleep(0.005)
-        else: 
+        else:
+            print("turning off")
             for i in range(NUM_LEDS):
                 led_strip.set_rgb(i, 0, 0, 0)
+            # save prev and last values
             update_value(red, green, blue, PREV_FILENAME)
             update_value(0, 0, 0)
         
