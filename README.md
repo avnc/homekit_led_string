@@ -103,7 +103,7 @@ def mqtt_callback(topic, msg):
         client.publish(topic, f"{red},{green},{blue}")
 ```
 
-One other note, we're using the file WIFI_CONFIG.py to store our configuration that will be specific to your lights and setup. You'll need to update this to have the WiFi credentials the device will use, your broker info and the topics (that match what is setup in the Homebridge plugin). The empty version of this config looks like this, you will need to replace the values with what works for your individual setup.
+One other note, we're using the file `WIFI_CONFIG.py` to store our configuration that will be specific to your lights and setup. You'll need to update this to have the WiFi credentials the device will use, your broker info and the topics (that match what is setup in the Homebridge plugin). The empty version of this config looks like this, you will need to replace the values with what works for your individual setup.
 
 ```python
 # Description: Configuration file for WIFI connection and MQTT broker
