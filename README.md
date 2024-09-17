@@ -28,8 +28,7 @@ From there, you'll need to install and configure the Homebridge-Mgttthing plugin
     "topics": {
         "getRGB": "Office\\Skull\\getRGB",
         "setRGB": "Office\\Skull\\setRGB",
-        "setOn": "Office\\Skull\\setOn",
-        "getOn": "Office\\Skull\\getOn"
+        "setOn": "Office\\Skull\\setOn"
     },
     "accessory": "mqttthing"
 }
