@@ -1,3 +1,5 @@
 .idea/*
 .vscode/*
 WIFI_CONFIG_REAL.py
+lib/umqtt/simple.mpy
+lib/umqtt/robust.mpy

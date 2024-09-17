@@ -42,6 +42,28 @@ Stepping through the important parts:
   ![alt text](Iskull.jpg)
 
 ## Code
+We need one additional library not included with Pimoroni-branded Micropython, the `umqtt` library (including umqtt.robust and umqtt.simple). I use the umqtt.robust version (you can get more info on this library here: https://github.com/micropython/micropython-lib/tree/27e4d73bc2618d378a0610960cf5e81985e5d914/micropython/umqtt.robust). Use should use MIP to install this on your device (note, robust uses simple so you need to install both). From the REPL in Thonny (or your IDE of choice):
+
+```python
+import mip
+mip.install("umqtt.simple")
+mip.install(“umqtt.robust”)
+```
+
+When this is run, you should see something like this:
+```
+>>> import mip
+>>> mip.install("umqtt.simple")
+Installing umqtt.simple (latest) from https://micropython.org/pi/v2 to /lib
+Copying: /lib/umqtt/simple.mpy
+Done
+>>> mip.install("umqtt.robust")
+Installing umqtt.robust (latest) from https://micropython.org/pi/v2 to /lib
+Copying: /lib/umqtt/robust.mpy
+Done
+>>> 
+```
+
 The code for this is pretty simple. As we are using the Pimoroni variant of MicroPython with their nice example code coming on the Plasma Stick, we will reuse the provided `network_manager.py`. This is used to do the initial connection to wifi as shown below. Pay attention to the note, a frequent problem I had was that when power went out briefly from storms and such, the wifi would take longer to come back than I originally had for a timeout here. I've since extended it to 3mins to give my WiFi time to reboot.
 
 ```python
