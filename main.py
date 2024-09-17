@@ -13,9 +13,10 @@ from machine import Timer, Pin
 # Constants
 # Set how many LEDs you have, set this as needed
 NUM_LEDS = 50
-FILENAME = "lastvalue.txt" # file to store last value
+LAST_FILENAME = "lastvalue.txt" # file to store last value
+PREV_FILENAME = "prevvalue.txt" # file to store the previous value
 
-def read_last_value(filename):
+def read_value(filename):
     try:
         with open(filename) as f:
             val = f.read()
@@ -24,14 +25,15 @@ def read_last_value(filename):
     return map(int, val.split(","))
 
 # Define the RGB color (initially off unless a saved value is found)
-def update_last_value( red, green, blue ):
+def update_value(red, green, blue, update_file = LAST_FILENAME ):
     try:
-        f = open(FILENAME, "wt")
+        f = open(update_file, "wt")
         f.write(str(red) + "," + str(green) + "," + str(blue))
-        print("wrote last value to file")
+        print(f"wrote value to file {update_file}")
         f.close()
-    except:
+    except Exception as e:
         # do nothing
+        print(f"exception {e} updating last value file")
 
 # Function to handle incoming MQTT messages
 def mqtt_callback(topic, msg):
@@ -46,16 +48,19 @@ def mqtt_callback(topic, msg):
         # Replace 'gpio_red', 'gpio_green', and 'gpio_blue' with the actual GPIO pin numbersif topic.endswith(b"setOn"):
         for i in range(NUM_LEDS):
             led_strip.set_rgb(i, red, green, blue)
-        update_last_value(red, green, blue)
+        update_value(red, green, blue)
     if topic.endswith(b"setOn"):    
         if msg == b"true":
             print("turning on")
+            red, green, blue = read_value(PREV_FILENAME)
             for i in range(NUM_LEDS):
                 led_strip.set_rgb(i, red, green, blue)
                 time.sleep(0.005)
         else: 
             for i in range(NUM_LEDS):
-                led_strip.set_rgb(i, 0, 0, 0)            
+                led_strip.set_rgb(i, 0, 0, 0)
+            update_value(red, green, blue, PREV_FILENAME)
+            update_value(0, 0, 0)
         
     elif topic.endswith(b"getRGB"):
         # Respond with the current RGB color
@@ -65,9 +70,9 @@ def status_handler(mode, status, ip):
     # reports wifi connection status
     print(mode, status, ip)
     print('Connecting to wifi...')
-    # flash while connecting
+    # flash purple while connecting
     for i in range(NUM_LEDS):
-        led_strip.set_rgb(i, 255, 255, 255)
+        led_strip.set_rgb(i, 30, 10, 70) 
         time.sleep(0.02)
     for i in range(NUM_LEDS):
         led_strip.set_rgb(i, 0, 0, 0)
@@ -85,11 +90,8 @@ def status_handler(mode, status, ip):
                 led_strip.set_rgb(i, 0, 0, 0)
 
 # read last value from file           
-red, green, blue = read_last_value(FILENAME)
-print(f"last value is {val}")
-
-# set up the Pico W's onboard LED
-pico_led = Pin('LED', Pin.OUT)
+red, green, blue = read_value(LAST_FILENAME)
+print(f"last values are r:{red}, g:{green}, b:{blue}")
 
 # set up the WS2812 / NeoPixel™ LEDs
 led_strip = plasma.WS2812(NUM_LEDS, 0, 0, plasma_stick.DAT, color_order=plasma.COLOR_ORDER_RGB)
@@ -117,6 +119,7 @@ client.connect()
 client.subscribe(mqtt_topic_set)
 client.subscribe(mqtt_topic_get)
 client.subscribe(mqtt_topic_setOn)
+print("MQTT connection setup")
 
 # set initial values (read from file or defaults to 0,0,0 if no file)
 for i in range(NUM_LEDS):
