@@ -3,10 +3,11 @@
 SSID = "WIFI_SSID" # e.g. "my_wifi"
 PSK = "WIFI_PASSWORD" # e.g. "password"
 COUNTRY = "COUNTRY_CODE" # e.g. "US"
-BROKER = "BROKER_IP" # e.g. "192.168.1.2"
+BROKER = "BROKER_IP" # e.g. "mqtt://192.168.1.2"
 HOSTNAME = "NETWORK_HOSTNAME" # e.g. "DasBlinkenLights"
-LOCATION = b"LOCATION" # e.g. b"Living\\Cabinet2\\" for MQTT topic
-# MQTT topics, note these need to match the topics configured in the MQTT Thing plugin
+LOCATION = b"LOCATION" # e.g. b"Living\\Cabinet2\\" for MQTT topic, this can be used to group devices
+
+# MQTT topics, note these need to match the topics configured in the MQTTThing plugin configuration
 # These are the topics that the Pico W will subscribe to
 # and the topics that Homebridge will publish to
 SET_ON = b"setOn" # MQTT topic for turning on/off

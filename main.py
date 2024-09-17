@@ -1,14 +1,11 @@
 import WIFI_CONFIG
 from network_manager import NetworkManager
 import uasyncio
-import urequests
-import machine
 import os
 import time
 from umqtt.robust import MQTTClient
 import plasma
 from plasma import plasma_stick
-from machine import Timer, Pin
 
 # Constants
 # Set how many LEDs you have, set this as needed
