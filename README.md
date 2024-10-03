@@ -17,7 +17,7 @@ I have Homebridge running on a Raspberry Pi Compute Module 4 that is installed o
 
 Homebridge and the MQTT broker can be setup on a variety of hosts, the only really important part is they stay always on. Low power ARM SBCs are great for this, but anything will work.
 
-From there, you'll need to install and configure the Homebridge-Mgttthing plugin, see the link above for more details on how this works. My config for one of my lights looks like this: 
+From there, you'll need to install and configure the Homebridge-Mqttthing plugin, see the link above for more details on how this works. My config for one of my lights looks like this: 
 
 ```json
 {
