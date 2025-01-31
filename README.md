@@ -37,12 +37,12 @@ From there, you'll need to install and configure the Homebridge-Mqttthing plugin
 Stepping through the important parts:
 - `"type"` needs to be set to `"lightbulb-RGB"` for my config (and code) to work, see more info here: https://github.com/arachnetech/homebridge-mqttthing/blob/93f81e506c7579f4250c1e0bedcb822a8be517e0/docs/Configuration.md
  - `"url"` should be set to the URL and port of your MQTT broker
- - `"topics"` needs to be populated with the MQTT topics that that will be used to set the RGB values and on/off state, these topics need to be the same as is used in the code. If you are implementing more than one light, each will need their own topics. In my case, I've organized them by room and device, ie. `Office\\Skull` for my skull light shown below.
+ - `"topics"` needs to be populated with the MQTT topics that will be used to set the RGB values and on/off state, these topics need to be the same as is used in the code. If you are implementing more than one light, each will need their own topics. In my case, I've organized them by room and device, ie. `Office\\Skull` for my skull light shown below.
 
   ![alt text](Iskull.jpg)
 
 ## Code
-We need one additional library not included with Pimoroni-branded Micropython, the `umqtt` library (including umqtt.robust and umqtt.simple). I use the umqtt.robust version (you can get more info on this library here: https://github.com/micropython/micropython-lib/tree/27e4d73bc2618d378a0610960cf5e81985e5d914/micropython/umqtt.robust). Use should use MIP to install this on your device (note, robust uses simple so you need to install both). From the REPL in Thonny (or your IDE of choice):
+We need one additional library not included with Pimoroni-branded Micropython, the `umqtt` library (including umqtt.robust and umqtt.simple). I use the umqtt.robust version (you can get more info on this library here: https://github.com/micropython/micropython-lib/tree/27e4d73bc2618d378a0610960cf5e81985e5d914/micropython/umqtt.robust). You should use MIP to install this on your device (note, robust uses simple so you need to install both). From the REPL in Thonny (or your IDE of choice):
 
 ```python
 import mip
